@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:dubbo="http://code.alibabatech.com/schema/dubbo" 
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.2.xsd
+        http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-4.2.xsd
+        http://code.alibabatech.com/schema/dubbo http://code.alibabatech.com/schema/dubbo/dubbo.xsd
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.2.xsd">
+        
+	
+	<!-- mvc注解驱动配置 -->
+	<mvc:annotation-driven />
+	<!-- 注解扫描 -->
+	<context:component-scan base-package="com.taotao.order.controller" />
+	
+	<!-- 引入properties文件 -->
+	<context:property-placeholder location="classpath:properties/*.properties" />
+	
+	<!-- 配置内部资源视图视图解析器 -->
+	<bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<property name="prefix" value="/WEB-INF/jsp/"></property> <!-- 前缀 -->
+		<property name="suffix" value=".jsp"></property>		  <!-- 后缀 -->
+	</bean>
+	
+	<!-- 拦截器配置 -->
+	<mvc:interceptors>
+		<mvc:interceptor>
+			<mvc:mapping path="/order/**"/>
+			<bean class="com.taotao.order.interceptor.LoginInterceptor"></bean>		
+		</mvc:interceptor>
+	
+	</mvc:interceptors>
+	
+	<!-- 单机版连接池 -->
+	<bean id="jedisPool" class="redis.clients.jedis.JedisPool">
+		<constructor-arg name="host" value="${host}" />
+		<constructor-arg name="port" value="${port}" />
+	</bean>
+	<bean id="jedisClientPool" class="com.taotao.jedis.JedisClientPool">
+		<!-- <property name="jedisPool" ref="jedisPool"></property> -->
+	</bean>
+	
+	<!-- 集群 -->
+	<!-- <bean id="jedisCluster" class="redis.clients.jedis.JedisCluster">
+		<constructor-arg>
+			<set>
+				<bean class="redis.clients.jedis.HostAndPort">
+					<constructor-arg name="host" value="${CLUSTER_NODES_7001_HOST}"></constructor-arg>
+					<constructor-arg name="port" value="${CLUSTER_NODES_7001_PORT}"></constructor-arg>
+				</bean>
+				<bean class="redis.clients.jedis.HostAndPort">
+					<constructor-arg name="host" value="${CLUSTER_NODES_7002_HOST}"></constructor-arg>
+					<constructor-arg name="port" value="${CLUSTER_NODES_7002_PORT}"></constructor-arg>
+				</bean>
+				<bean class="redis.clients.jedis.HostAndPort">
+					<constructor-arg name="host" value="${CLUSTER_NODES_7003_HOST}"></constructor-arg>
+					<constructor-arg name="port" value="${CLUSTER_NODES_7003_PORT}"></constructor-arg>
+				</bean>
+				<bean class="redis.clients.jedis.HostAndPort">
+					<constructor-arg name="host" value="${CLUSTER_NODES_7004_HOST}"></constructor-arg>
+					<constructor-arg name="port" value="${CLUSTER_NODES_7004_PORT}"></constructor-arg>
+				</bean>
+				<bean class="redis.clients.jedis.HostAndPort">
+					<constructor-arg name="host" value="${CLUSTER_NODES_7005_HOST}"></constructor-arg>
+					<constructor-arg name="port" value="${CLUSTER_NODES_7005_PORT}"></constructor-arg>
+				</bean>
+				<bean class="redis.clients.jedis.HostAndPort">
+					<constructor-arg name="host" value="${CLUSTER_NODES_7006_HOST}"></constructor-arg>
+					<constructor-arg name="port" value="${CLUSTER_NODES_7006_PORT}"></constructor-arg>
+				</bean>
+			</set>
+		</constructor-arg>
+	</bean>
+	<bean id="jedisClientCluster" class="com.taotao.jedis.JedisClientCluster"/>
+	 -->
+	
+	<!-- 配置资源映射，解决静态资源拦截的问题 -->
+	<!-- 
+		mapping：映射
+		location：本地资源路径，注意必须是webapp根目录下的路径
+		
+		配置的location一定要是webapp根目录下才行，如果你将资源目录，放置到webapp/WEB-INF下面的话，则就会访问失败
+		当然，你非要放在WEB-INF中，则必须修改resources映射，如：
+		<mvc:resources  location="/WEB-INF/js/" mapping="/js/**" />
+	 -->
+	<!-- <mvc:resources location="/js/" mapping="/js/**"></mvc:resources>
+	<mvc:resources location="/css/" mapping="/css/**"></mvc:resources> -->
+	
+	<!-- 引用dubbo服务 -->
+	<!-- 计算依赖关系 -->
+	<dubbo:application name="taotao-cart-web"/>	
+	<!-- 发现服务 -->
+	<dubbo:registry protocol="zookeeper" address="${address}" />
+	<!-- 引用远程服务 -->
+	<dubbo:reference id="tbItemService" interface="com.taotao.service.TbItemService"></dubbo:reference>
+	<dubbo:reference id="userService" interface="com.taotao.sso.service.UserService"></dubbo:reference>
+	<dubbo:reference id="cartService" interface="com.taotao.cart.service.CartService"></dubbo:reference>
+	<dubbo:reference id="orderService" interface="com.taotao.order.service.OrderService"></dubbo:reference>
+</beans>

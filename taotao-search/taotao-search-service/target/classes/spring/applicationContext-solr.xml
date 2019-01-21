@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:context="http://www.springframework.org/schema/context" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.2.xsd
+	http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.2.xsd
+	http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.2.xsd 
+	http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.2.xsd
+	http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.2.xsd">
+	
+	<!-- 开启注解 -->	
+	<context:annotation-config />
+	
+	<!-- 扫描dao-->
+	<context:component-scan base-package="com.taotao.search.dao" />
+	
+	<!-- 单机版solr(单机版的配置不要和集群版的配置共存，使用单机版时，集群版要注释掉，反之亦然) -->
+	<!-- <bean id="solrServer" class="org.apache.solr.client.solrj.impl.HttpSolrClient">
+		<constructor-arg name="baseURL" value="${solr_baseURL}"></constructor-arg>
+	</bean> -->
+	
+	<!-- 集群版 -->
+	<bean id="cloudSolrServer" class="org.apache.solr.client.solrj.impl.CloudSolrClient" >
+		<!-- 构造参数zkHost:zookeeper集群 -->
+		<constructor-arg name="zkHost" value="${CLUSTER_ZK_HOST}" />
+		<!-- 设置默认的collection（必须设置） -->
+		<property name="defaultCollection" value="${CLOUDSOLRSERVER_DEFAULTCOLLECTION}" />
+	</bean>
+	
+	
+</beans>
+
+
+
+
+
+
+
+
+
+

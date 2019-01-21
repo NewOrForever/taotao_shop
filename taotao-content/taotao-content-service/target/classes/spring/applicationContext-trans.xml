@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:context="http://www.springframework.org/schema/context" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.2.xsd
+	http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.2.xsd
+	http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.2.xsd 
+	http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.2.xsd">
+	
+	<!-- 事务管理 -->
+ 	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+ 		<!-- 数据源 -->
+		<property name="dataSource" ref="dataSource"></property>		
+	</bean>
+	
+	<!-- 事务增强,通知 -->
+	<tx:advice id="txAdvice" transaction-manager="transactionManager">
+		<!-- 传播行为 -->
+		<tx:attributes>
+			<tx:method name="get*" read-only="true" propagation="SUPPORTS"/>
+			<tx:method name="select*" read-only="true" propagation="SUPPORTS"/>	
+			<tx:method name="find*" read-only="true" propagation="SUPPORTS"/>
+			<tx:method name="insert*" read-only="false" propagation="REQUIRED"/>	
+			<tx:method name="add*" read-only="false" propagation="REQUIRED"/>
+			<tx:method name="save*" read-only="false" propagation="REQUIRED"/>
+			<tx:method name="create*" read-only="false" propagation="REQUIRED"/>
+			<tx:method name="update*" read-only="false" propagation="REQUIRED"/>
+			<tx:method name="delete*" read-only="false" propagation="REQUIRED"/>	
+		</tx:attributes>
+	</tx:advice>
+	
+	<!-- 切面 -->
+	<aop:config>
+		<aop:pointcut expression="execution(* com.taotao.content.service.*.*(..))" id="point"/>
+		<aop:advisor advice-ref="txAdvice" pointcut-ref="point" />
+	</aop:config>
+	
+</beans>
+
+
+
+

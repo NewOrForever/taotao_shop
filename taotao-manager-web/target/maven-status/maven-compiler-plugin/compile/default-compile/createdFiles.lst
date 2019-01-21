@@ -1,0 +1,6 @@
+com\taotao\controller\SolrIndexManagerController.class
+com\taotao\controller\TbItemCatController.class
+com\taotao\controller\PageController.class
+com\taotao\controller\TbItemController.class
+com\taotao\controller\TbContentCategoryController.class
+com\taotao\controller\TbContentController.class

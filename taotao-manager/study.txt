@@ -1,0 +1,93 @@
+1.要是在工作空间中没有一些资源文件没有（比如mapper的xml以及一些配置文件，那么需要在pom中配置资源文件拷贝的插件）
+
+
+2.<!-- MVC配置 -->
+<servlet>
+	<servlet-name>DispatcherServlet</servlet-name>
+	<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+	<init-param>
+		<!-- contextConfigLocation不是必须的， 如果不配置contextConfigLocation，springmvc配置文件默认在 ：WEB-INF/servlet的 name+"-servlet.xml" -->
+		<param-name>contextConfigLocation</param-name>
+		<param-value>classpath:spring/springmvc.xml</param-value>
+	</init-param>
+</servlet>
+<servlet-mapping>
+	<servlet-name>DispatcherServlet</servlet-name>
+	<!-- 拦截所有，包括静态资源（入js,css等），jsp除外 -->
+	<!-- /* 拦截所有包括jsp -->
+	<url-pattern>/</url-pattern>
+</servlet-mapping>
+
+	
+3.<!-- 配置资源映射，解决静态资源拦截的问题 -->
+<!-- 
+	mapping：映射
+	location：本地资源路径，注意必须是webapp根目录下的路径
+	
+	配置的location一定要是webapp根目录下才行，如果你将资源目录，放置到webapp/WEB-INF下面的话，则就会访问失败
+	当然，你非要放在WEB-INF中，则必须修改resources映射，如：
+	<mvc:resources  location="/WEB-INF/js/" mapping="/js/**" />
+ -->
+<mvc:resources location="/js/" mapping="/js/**"></mvc:resources>
+<mvc:resources location="/css/" mapping="/css/**"></mvc:resources>
+
+4.js修改后浏览器清一下缓存
+
+5.datagrid分页
+请求的参数：
+page=1&rows=30
+响应的json数据格式：
+Easyui中datagrid控件要求的数据格式为：
+{total:”2”,rows:[{“id”:”1”,”name”:”张三”},{“id”:”2”,”name”:”李四”}]}
+
+
+/****************redis连不上******************/
+1.bind 127.0.0.1 没有注释
+2.linux防火墙没有开启端口
+
+
+/******************solr连不上*********************/
+1.linux防火墙没有开启端口
+
+/*******************activemq注意事项*********************/
+1.创建ConnectionFactory对象时，brokerURL应该要tcp协议，端口号不是启动工程的8161，而是61616，不要忘了开放服务器的端口
+ConnectionFactory connectionFactory = new ActiveMQConnectionFactory("tcp://192.168.120.157:61616");
+
+/*****************spring的配置文件突然读取不了schema文件********************/
+1.spring读取配置文件首先是在本地读取的，spring包中有scheme文件的，可以在/META-INF/spring.schemas中查看版本是否对的上
+2.maven update-project（我更新之后就OK了）
+
+/*******************sso系统*********************/
+1.指定返回响应数据的content-type，当responsebody返回的是json字符串的时候
+	/**
+	 * 根据token获取user
+	 * @param token
+	 * @return
+	 */
+	@RequestMapping(value="/user/token/{token}", 
+					// 指定返回响应数据的content-type，不配置的话返回的中文会有乱码
+					produces=MediaType.APPLICATION_JSON_UTF8_VALUE)
+	@ResponseBody
+	public String getUserByToken(@PathVariable String token, String callback){
+		TaoTaoResult result = userService.getUserByToken(token);
+		// js跨域处理(jsonp)
+		// callback(data) 拼接成这样的js语句
+		if(StringUtils.isNotBlank(callback)){
+			return callback + "(" + JsonUtil.objectToJson(result) + ");";
+		}
+		return JsonUtil.objectToJson(result);
+	}
+
+/***************购物车服务系统***************/
+1.web.xml忘记配了，导致web层一直报no provider
+2.web.xml配好，本来考虑只需要配置redis、dubbo，但是服务启动报错，mapper没有扫描到（因为服务里调用了TbItemMapper）
+3.既然需要使用到数据库，那么spring就都需要配置整合了
+
+
+
+
+
+
+
+
+
