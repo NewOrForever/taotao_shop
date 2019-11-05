@@ -28,7 +28,7 @@
 		<jedis.version>2.9.0</jedis.version>
 		<solrj.version>6.6.5</solrj.version>
 		<dubbo.version>2.6.0</dubbo.version>
-		<zookeeper.version>3.4.13</zookeeper.version>
+		<zookeeper.version>3.4.14</zookeeper.version>
 		<zkclient.version>0.1</zkclient.version>
 		<activemq.version>5.15.6</activemq.version>
 		<freemarker.version>2.3.28</freemarker.version>
